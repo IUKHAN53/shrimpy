@@ -1,0 +1,9 @@
+[20-Mar-2021 12:57:34 Europe/London] PHP Fatal error:  require(): Failed opening required '/home/g4i/public_html/st/vendor/autoload.php' (include_path='.:/opt/alt/php74/usr/share/pear') in /home/g4i/public_html/st/artisan on line 18
+[20-Mar-2021 13:01:53 Europe/London] PHP Fatal error:  Uncaught ErrorException: proc_close() has been disabled for security reasons in phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php:957
+Stack trace:
+#0 [internal function]: Composer\Util\ErrorHandler::handle(2, 'proc_close() ha...', 'phar:///opt/cpa...', 957, Array)
+#1 phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php(957): proc_close(Resource id #327)
+#2 phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php(753): Symfony\Component\Console\Application->getSttyColumns()
+#3 phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php(714): Symfony\Component\Console\Application->getTerminalDimensions()
+#4 phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php(648): Symfony\Component\Console\Application->getTerminalWidth()
+#5 phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php(127): Symfony\Component\Console\Application->renderException(Object(ErrorException), in phar:///opt/cpanel/composer/bin/composer/vendor/symfony/console/Application.php on line 957
