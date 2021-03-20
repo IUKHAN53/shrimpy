@@ -8,7 +8,7 @@
                     <h3>Binance Coins</h3>
                 </div>
                 <div class="float-right">
-                    <span class="m-3">Last Updated: {{$coins->first()->updated_at}}</span>
+                    <span class="m-3">Last Updated: {{($coins->first())?$coins->first()->updated_at:''}}</span>
                     <button class="btn btn-primary" id="get_binance_coins">
                         Sync Binance Coins
                     </button>

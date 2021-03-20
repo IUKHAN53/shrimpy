@@ -106,7 +106,7 @@ class HomeController extends Controller
                         'symbol' => $ticker->symbol,
                         'price_usd' => $ticker->priceUsd,
                         'high' => $ticker->priceUsd,
-                        'percent_change_24_h_usd' => $ticker->percentChange24hUsd,
+                        'percent_change_24_h_usd' => $ticker->percentChange24hUsd ?? '',
                     ]);
                 }
             }
