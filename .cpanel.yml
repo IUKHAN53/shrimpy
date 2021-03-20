@@ -1,5 +1,10 @@
 ---
 deployment:
-  tasks:
-    - export DEPLOYPATH=/home/g4i/public_html/st
-    - /bin/cp index.html $DEPLOYPATH
+tasks:
+  - export ROOT=/home/g4i/
+  - /bin/ls -A -I ".git" -I "public" | /bin/xargs -I % /bin/cp -ru % $ROOT
+  # print without copy : - /bin/ls -A -I ".git" -I "public" | /bin/xargs -t -I % /bin/cp -ru % $ROOT
+
+  - export PUBLIC=/home/g4i/public_html/st
+  - /bin/ls -A -I ".htaccess" public | /bin/xargs -I % /bin/cp -ru public/% $PUBLIC
+# print without copy : - /bin/ls -A -I ".htaccess" public | /bin/xargs -t -I % /bin/cp -ru public/% $PUBLIC
