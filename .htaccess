@@ -3,7 +3,7 @@
         Options -MultiViews
     </IfModule>
     RewriteEngine On
-    RewriteBase /shrimpy
+    RewriteBase /st
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
     RewriteCond %{REQUEST_FILENAME} -d [OR]
