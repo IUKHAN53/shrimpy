@@ -1,7 +1,10 @@
 ---
 deployment:
-  tasks:
-    - export DEPLOYPATH=/home/g4i/shrimpy
-    - /bin/cp -r * $DEPLOYPATH #copy all from root
-    - /bin/cp ./public/js/*.js $DEPLOYPATH/public_html/js
-    - /bin/cp ./public/css/*.css $DEPLOYPATH/public_html/css
+tasks:
+  - export ROOT=/home/g4i/
+  - /bin/ls -A -I ".git" -I "public" | /bin/xargs -I % /bin/cp -ru % $ROOT
+  # print without copy : - /bin/ls -A -I ".git" -I "public" | /bin/xargs -t -I % /bin/cp -ru % $ROOT
+
+  - export PUBLIC=/home/g4i/shrimpy
+  - /bin/ls -A -I ".htaccess" public | /bin/xargs -I % /bin/cp -ru public/% $PUBLIC
+# print without copy : - /bin/ls -A -I ".htaccess" public | /bin/xargs -t -I % /bin/cp -ru public/% $PUBLIC
