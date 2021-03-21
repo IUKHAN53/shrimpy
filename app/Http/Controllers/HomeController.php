@@ -172,15 +172,13 @@ class HomeController extends Controller
                     }
                 } else if ($usdt->percent < 8) {
                     Log::debug('USDT percent less then 8');
-                }
-                if ($coin->percent == 1 && $coin->binance_coin->price_usd > $high_99) {
+                } else if ($coin->percent == 1 && $coin->binance_coin->price_usd > $high_99) {
                     $coin->percent += 8;
                     $coin->save();
                     $usdt->percent -= 8;
                     $usdt->save();
                     Log::debug('Applied Process: Add 8 to ' . $coin->symbol . ' Percent, Deduct 8 from USDT');
-                }
-                if ($coin->percent == 1 && $coin->binance_coin->price_usd < $high_96) {
+                } else if ($coin->percent == 1 && $coin->binance_coin->price_usd < $high_96) {
                     $coin->percent += 8;
                     $coin->save();
                     $usdt->percent -= 8;
