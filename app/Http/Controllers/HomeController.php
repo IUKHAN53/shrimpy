@@ -192,6 +192,7 @@ class HomeController extends Controller
                 }
             }
         } else {
+            Log::debug('Cannot auto trade when USDT does not exist in my coins');
             return back()->with('error', 'Cannot auto trade when USDT does not exist in my coins');
         }
         return back()->with('info', 'Auto trades Applied');
