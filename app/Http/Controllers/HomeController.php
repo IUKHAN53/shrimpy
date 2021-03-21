@@ -154,7 +154,7 @@ class HomeController extends Controller
         $coins = MyCoin::with('binance_coin', 'usdt')->get();
         $usdt = $coins->where('symbol', 'USDT')->first();
         $coins = $coins->where('symbol', '!=', 'USDT');
-        if ($usdt->count() > 0) {
+        if ($usdt) {
             foreach ($coins as $coin) {
                 Log::debug('Coin: ' . $coin->symbol);
                 $high_99 = $this->getPercentage(99, $coin->binance_coin->high);
