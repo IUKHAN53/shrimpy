@@ -215,7 +215,7 @@ class HomeController extends Controller
                 "rebalancePeriod":0,
                 "strategy":{
                     "isDynamic":false,
-                    "allocations":[' . implode($coins_data, ', ') . ']
+                    "allocations":[' . implode(', ',$coins_data) . ']
                 },
                 "strategyTrigger":"Threshold",
                 "rebalanceThreshold":"1",
