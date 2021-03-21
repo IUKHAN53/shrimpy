@@ -76,7 +76,7 @@ class HomeController extends Controller
             ]);
             return redirect(route('my-coins'))->with('success', 'Coin Added Successfully');
         } else {
-            return view('create-coin')->with('b_coins', BinanceCoin::all());
+            return view('create-coin')->with('b_coins', BinanceCoin::orderBy('symbol','asc')->get());
         }
     }
 
