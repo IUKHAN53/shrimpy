@@ -100,7 +100,7 @@ class HomeController extends Controller
             $bnb->save();
             $percentage = 99;
         }
-        $coins = MyCoin::all()->except($bnb->id);
+        $coins = MyCoin::where('symbol','!=', 'BNB')->get();
         $total = ($coins) ? $coins->count() : 1;
         $percent = floor($percentage / $total);
         $total_percent = 0;
