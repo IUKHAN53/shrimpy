@@ -20,12 +20,12 @@ class API_Connection
 
     public function __construct()
     {
-        $this->key = env('SHRIMPY_KEY');
-        $this->secret = env('SHRIMPY_SECRET');
-        $this->base_url = env('SHRIMPY_BASE_URL');
-        $this->account = env('SHRIMPY_DEFAULT_ACCOUNT');
-        $this->portfolio = env('SHRIMPY_DEFAULT_PORTFOLIO');
-        $this->exchange = env('SHRIMPY_DEFAULT_EXCHANGE');
+        $this->base_url = config('app.base_url');
+        $this->key = config('app.shrimpy_key');
+        $this->secret = config('app.shrimpy_secret');
+        $this->account = config('app.shrimpy_default_account');
+        $this->portfolio = config('app.shrimpy_default_portfolio');
+        $this->exchange = config('app.shrimpy_default_exchange');
         $this->secret = base64_decode($this->secret);
     }
 

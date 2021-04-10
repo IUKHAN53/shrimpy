@@ -121,6 +121,16 @@ return [
 
     'key' => env('APP_KEY'),
 
+
+
+//    shrimpy Keys and settings
+    'base_url' => env('SHRIMPY_BASE_URL'),
+    'shrimpy_key' => env('SHRIMPY_KEY'),
+    'shrimpy_secret' => env('SHRIMPY_SECRET'),
+    'shrimpy_default_account' => env('SHRIMPY_DEFAULT_ACCOUNT'),
+    'shrimpy_default_portfolio' => env('SHRIMPY_DEFAULT_PORTFOLIO'),
+    'shrimpy_default_exchange' => env('shrimpy_default_exchange'),
+
     'cipher' => 'AES-256-CBC',
 
     /*
