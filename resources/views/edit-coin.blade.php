@@ -26,9 +26,14 @@
                             <p style="color: red">{{ $message }}</p>@enderror
                         </div>
                         <div class="form-group">
-                            <label for="percent">Percent</label>
-                            <input type="number" class="form-control" max="100" min="0" id="percent" value="{{$my_coin->percent}}" name="percent" placeholder="Enter Coin Percent">
-                            @error('percent')
+                            <label for="action">Action</label>
+                            <select type="number" class="form-control" name="action" id="action">
+                                <option value="" {{($my_coin->action == null)?'selected':''}}>Select Action</option>
+                                <option value="send" {{($my_coin->action == 'send')?'selected':''}}>Send</option>
+                                <option value="convert" {{($my_coin->action == 'convert')?'selected':''}}>Convert</option>
+                                <option value="remove" {{($my_coin->action == 'remove')?'selected':''}}>Remove</option>
+                            </select>
+                            @error('action')
                             <p style="color: red">{{ $message }}</p>@enderror
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>

@@ -32,7 +32,7 @@
                     <a class="nav-link" href="{{route('home')}}">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item {{(request()->routeIs('my-coins'))?'active':''}}">
-                    <a class="nav-link" href="{{route('my-coins')}}">My Coins</a>
+                    <a class="nav-link" href="{{route('my-coins')}}">Split Shrimpy Coins</a>
                 </li>
                 <li class="nav-item {{(request()->routeIs('binance-coins'))?'active':''}}">
                     <a class="nav-link" href="{{route('binance-coins')}}">Binance Coins</a>

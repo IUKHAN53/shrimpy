@@ -25,8 +25,7 @@ class HomeController extends Controller
     public function myCoins()
     {
         return view('my-coins')->with([
-            'my_coins' => MyCoin::all(),
-            'split_coins' => SplitShrimpy::pluck('id'),
+            'my_coins' => SplitShrimpy::all(),
         ]);
     }
 
@@ -35,21 +34,20 @@ class HomeController extends Controller
         if ($request->isMethod('post')) {
             $request->validate([
                 'binance_coin_id' => 'required', 'unique:my_coins,binance_coin_id' . $request->coin_id,
-                'percent' => 'required|numeric|max:100|min:0'
+                'action' => 'required'
             ], [
                 'binance_coin_id.required' => 'Coin Field is required',
             ]);
             $binance_coin = BinanceCoin::find($request->binance_coin_id);
-            MyCoin::findOrFail($request->coin_id)->update([
+            SplitShrimpy::findOrFail($request->coin_id)->update([
                 'symbol' => $binance_coin->symbol,
-                'percent' => $request->percent,
                 'binance_coin_id' => $binance_coin->id,
             ]);
             return redirect(route('my-coins'))->with('success', 'Coin Updated Successfully');
 
         } else {
             return view('edit-coin')->with([
-                'my_coin' => MyCoin::findOrFail($request->coin_id),
+                'my_coin' => SplitShrimpy::findOrFail($request->coin_id),
                 'b_coins' => BinanceCoin::all()
             ]);
         }
@@ -57,7 +55,7 @@ class HomeController extends Controller
 
     public function deleteCoin(Request $request)
     {
-        $coin = MyCoin::findOrFail($request->coin_id);
+        $coin = SplitShrimpy::findOrFail($request->coin_id);
         $coin->delete();
         return redirect(route('my-coins'))->with('success', 'Coin Deleted Successfully');
 
@@ -67,15 +65,16 @@ class HomeController extends Controller
     {
         if ($request->isMethod('post')) {
             $request->validate([
-                'binance_coin_id' => 'required|unique:my_coins,binance_coin_id',
-//                'percent' => 'required|numeric|max:100|min:0'
+                'binance_coin_id' => 'required|unique:split_shrimpies,binance_coin_id',
+                'action' => 'required'
             ], [
                 'binance_coin_id.required' => 'Coin Field is required',
             ]);
             $binance_coin = BinanceCoin::findOrFail($request->binance_coin_id);
-            MyCoin::create([
+            SplitShrimpy::create([
                 'symbol' => $binance_coin->symbol,
                 'percent' => 0,
+                'action' => $request->action,
                 'binance_coin_id' => $binance_coin->id,
             ]);
             $this->calculateEvenly();
@@ -93,14 +92,14 @@ class HomeController extends Controller
 
     function calculateEvenly()
     {
-        $bnb = MyCoin::where('symbol', 'BNB')->first();
+        $bnb = SplitShrimpy::where('symbol', 'BNB')->first();
         $percentage = 100;
         if($bnb){
             $bnb->percent = 1;
             $bnb->save();
             $percentage = 99;
         }
-        $coins = MyCoin::where('symbol','!=', 'BNB')->get();
+        $coins = SplitShrimpy::where('symbol','!=', 'BNB')->get();
         $total = ($coins) ? $coins->count() : 1;
         $percent = floor($percentage / $total);
         $total_percent = 0;
@@ -109,14 +108,14 @@ class HomeController extends Controller
             $coin->save();
             $total_percent += $percent;
         }
-        $otherCoin = MyCoin::firstOrFail();
+        $otherCoin = SplitShrimpy::firstOrFail();
         $otherCoin->percent += $percentage - $total_percent;
         $otherCoin->save();
     }
 
     public function updateAction(Request $request)
     {
-        SplitShrimpy::updateOrCreate(['my_coin_id' => $request->coin_id], [
+        SplitShrimpy::updateOrCreate(['id' => $request->coin_id], [
             'action' => $request->action,
         ]);
         return redirect(route('my-coins'))->with('success', 'Coin Updated Successfully');
@@ -188,7 +187,7 @@ class HomeController extends Controller
 
     public function autoTrades()
     {
-        $coins = MyCoin::with('binance_coin', 'usdt')->get();
+        $coins = SplitShrimpy::with('binance_coin', 'usdt')->get();
         $usdt = $coins->where('symbol', 'USDT')->first();
         $coins = $coins->where('symbol', '!=', 'USDT');
         if ($usdt) {
@@ -242,7 +241,7 @@ class HomeController extends Controller
             Log::debug('Cannot Update Portfolio When sum of percents does not equals 100');
             return back()->with('error', 'Cannot Update Portfolio When sum of percents does not equals 100');
         } else {
-            $coins = MyCoin::all();
+            $coins = SplitShrimpy::whereIn('action',['send','convert'])->get();
             foreach ($coins as $coin) {
                 $coins_data[] = '{"symbol":"' . $coin['symbol'] . '","percent":"' . $coin['percent'] . '"}';
             }

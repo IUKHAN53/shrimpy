@@ -15,9 +15,11 @@ class CreateSplitShrimpiesTable extends Migration
     {
         Schema::create('split_shrimpies', function (Blueprint $table) {
             $table->id();
+            $table->string('symbol');
+            $table->integer('percent');
             $table->enum('action',['send','convert','remove'])->nullable();
             $table->string('conversion_coin')->nullable();
-            $table->foreignId('my_coin_id')->constrained();
+            $table->foreignId('binance_coin_id')->unique();
             $table->timestamps();
         });
     }

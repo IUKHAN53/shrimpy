@@ -19,10 +19,21 @@
                             <select class="form-control" name="binance_coin_id" id="binance_coin">
                                 <option value="">Select Coin</option>
                                 @foreach($b_coins as $coin)
-                                    <option value="{{$coin->id}}">{{$coin->symbol}} - <span class="small">({{$coin->name}})</span></option>
+                                    <option value="{{$coin->id}}" {{(old('binance_coin_id') == $coin->id)?'selected':''}}>{{$coin->symbol}} - <span class="small">({{$coin->name}})</span></option>
                                 @endforeach
                             </select>
                             @error('binance_coin_id')
+                            <p style="color: red">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="form-group">
+                            <label for="action">Action</label>
+                            <select type="number" class="form-control" name="action" id="action">
+                                <option value="" {{(old('action') == null)?'selected':''}}>Select Action</option>
+                                <option value="send" {{(old('action') == 'send')?'selected':''}}>Send</option>
+                                <option value="convert" {{(old('action') == 'convert')?'selected':''}}>Convert</option>
+                                <option value="remove" {{(old('action') == 'remove')?'selected':''}}>Remove</option>
+                            </select>
+                            @error('action')
                             <p style="color: red">{{ $message }}</p>@enderror
                         </div>
                         <button type="submit" class="btn btn-primary">Submit</button>

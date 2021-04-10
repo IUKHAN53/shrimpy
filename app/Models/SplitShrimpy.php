@@ -10,8 +10,7 @@ class SplitShrimpy extends Model
     use HasFactory;
     protected $guarded = [];
 
-    public function my_coin()
-    {
-        return $this->hasOne(MyCoin::class);
+    public function binance_coin(){
+        return $this->belongsTo(BinanceCoin::class);
     }
 }
