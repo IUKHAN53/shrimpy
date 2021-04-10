@@ -88,7 +88,6 @@ class API_Connection
 
     function getTickerData()
     {
-        dd($this->exchange);
         $this->request_url = '/v1/' . $this->exchange . '/ticker';
         $this->method = 'GET';
         $this->body = '';
