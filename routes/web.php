@@ -34,5 +34,10 @@ Route::get('/delete-coin',[HomeController::class,'deleteCoin'])->name('delete-co
 Route::get('/edit-coin',[HomeController::class,'editCoin'])->name('edit-coin');
 Route::post('/edit-coin',[HomeController::class,'editCoin'])->name('edit-coin');
 
+//SplitShrimpy
+Route::get('/update-action',[HomeController::class,'updateAction'])->name('update-action');
+
+
+
 //sync binance coins
 Route::get('/sync-binance-coins',[HomeController::class,'syncBinanceCoins'])->name('sync-binance-coins');

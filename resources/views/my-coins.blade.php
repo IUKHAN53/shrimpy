@@ -23,7 +23,8 @@
                                 <th>Coin Name</th>
                                 <th>Coin Symbol</th>
                                 <th>Coin Percent</th>
-                                <th>Actions</th>
+                                <th>Action</th>
+                                <th>Coin Actions</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -32,6 +33,19 @@
                                     <td>{{$coin->binance_coin->name}}</td>
                                     <td>{{$coin->binance_coin->symbol}}</td>
                                     <td>{{$coin->percent}}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true"
+                                                    aria-expanded="false">{{$coin->split_shrimpy->action ?? 'Choose Action'}}
+                                            </button>
+                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                <a href="#" class="dropdown-item" onclick="changeAction('{{$coin->id}}','send')">Send</a>
+                                                <a href="#" class="dropdown-item" onclick="changeAction('{{$coin->id}}','convert')">Convert</a>
+                                                <a href="#" class="dropdown-item" onclick="changeAction('{{$coin->id}}','remove')">Remove</a>
+                                            </div>
+                                        </div>
+                                    </td>
                                     <td>
                                         <div class="btn-group">
                                             <a class="btn btn-success"
@@ -55,12 +69,22 @@
         $('#add-coin').click(function () {
             location.href = '{{route('add-coin')}}'
         });
-        function deleteCoin(coin_id){
-            if(confirm('Do you want to delete the coin')){
+
+        function changeAction(coin_id,action){
+            let url = '{{route('update-action',['coin_id'=>'coin-id','action'=>'action_name'])}}'
+            url = url.replace('coin-id', coin_id);
+            url = url.replace('action_name', action);
+            url = url.replace('&amp;', '&')
+            location.href = url;
+        }
+
+        function deleteCoin(coin_id) {
+            if (confirm('Do you want to delete the coin')) {
                 let url = '{{route('delete-coin',['coin_id'=>'coin-id'])}}'
-                url = url.replace('coin-id',coin_id);
+                url = url.replace('coin-id', coin_id);
                 location.href = url;
             }
         }
+
     </script>
 </x-layout>

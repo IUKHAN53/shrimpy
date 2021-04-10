@@ -14,6 +14,11 @@ class MyCoin extends Model
         return $this->belongsTo(BinanceCoin::class);
     }
 
+    public function split_shrimpy()
+    {
+        return $this->hasOne(SplitShrimpy::class);
+    }
+
     public function usdt(){
         return $this->binance_coin()->where('symbol','USDT');
     }

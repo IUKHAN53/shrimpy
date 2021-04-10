@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Api\API_Connection;
 use App\Models\BinanceCoin;
 use App\Models\MyCoin;
+use App\Models\SplitShrimpy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,7 +24,10 @@ class HomeController extends Controller
 
     public function myCoins()
     {
-        return view('my-coins')->with('my_coins', MyCoin::all());
+        return view('my-coins')->with([
+            'my_coins' => MyCoin::all(),
+            'split_coins' => SplitShrimpy::pluck('id'),
+        ]);
     }
 
     public function editCoin(Request $request)
@@ -64,25 +68,58 @@ class HomeController extends Controller
         if ($request->isMethod('post')) {
             $request->validate([
                 'binance_coin_id' => 'required|unique:my_coins,binance_coin_id',
-                'percent' => 'required|numeric|max:100|min:0'
+//                'percent' => 'required|numeric|max:100|min:0'
             ], [
                 'binance_coin_id.required' => 'Coin Field is required',
             ]);
-            $binance_coin = BinanceCoin::find($request->binance_coin_id);
+            $binance_coin = BinanceCoin::findOrFail($request->binance_coin_id);
             MyCoin::create([
                 'symbol' => $binance_coin->symbol,
-                'percent' => $request->percent,
+                'percent' => 0,
                 'binance_coin_id' => $binance_coin->id,
             ]);
+            $this->calculateEvenly();
             return redirect(route('my-coins'))->with('success', 'Coin Added Successfully');
         } else {
-            return view('create-coin')->with('b_coins', BinanceCoin::orderBy('symbol','asc')->get());
+            return view('create-coin')->with('b_coins', BinanceCoin::orderBy('symbol', 'asc')->get());
         }
     }
 
     public function binanceCoins()
     {
         return view('binance-coins')->with('coins', BinanceCoin::all());
+    }
+
+
+    function calculateEvenly()
+    {
+        $bnb = MyCoin::where('symbol', 'BNB')->first();
+        $percentage = 100;
+        if($bnb){
+            $bnb->percent = 1;
+            $bnb->save();
+            $percentage = 99;
+        }
+        $coins = MyCoin::all()->except($bnb->id);
+        $total = ($coins) ? $coins->count() : 1;
+        $percent = floor($percentage / $total);
+        $total_percent = 0;
+        foreach ($coins as $coin) {
+            $coin->percent = $percent;
+            $coin->save();
+            $total_percent += $percent;
+        }
+        $otherCoin = MyCoin::firstOrFail();
+        $otherCoin->percent += $percentage - $total_percent;
+        $otherCoin->save();
+    }
+
+    public function updateAction(Request $request)
+    {
+        SplitShrimpy::updateOrCreate(['my_coin_id' => $request->coin_id], [
+            'action' => $request->action,
+        ]);
+        return redirect(route('my-coins'))->with('success', 'Coin Updated Successfully');
     }
 
     public function syncBinanceCoins()
@@ -215,7 +252,7 @@ class HomeController extends Controller
                 "rebalancePeriod":0,
                 "strategy":{
                     "isDynamic":false,
-                    "allocations":[' . implode(', ',$coins_data) . ']
+                    "allocations":[' . implode(', ', $coins_data) . ']
                 },
                 "strategyTrigger":"Threshold",
                 "rebalanceThreshold":"1",
@@ -228,6 +265,7 @@ class HomeController extends Controller
         return true;
 
     }
+
 
     function getPercentage($percentage, $total)
     {
