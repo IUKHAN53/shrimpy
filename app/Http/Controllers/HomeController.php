@@ -99,7 +99,7 @@ class HomeController extends Controller
             $bnb->save();
             $percentage = 99;
         }
-        $coins = SplitShrimpy::where('symbol','!=', 'BNB')->get();
+        $coins = SplitShrimpy::where('symbol','!=', 'BNB')->WhereIn('action',['send','convert'])->get();
         $total = ($coins) ? $coins->count() : 1;
         $percent = floor($percentage / $total);
         $total_percent = 0;
@@ -118,6 +118,7 @@ class HomeController extends Controller
         SplitShrimpy::updateOrCreate(['id' => $request->coin_id], [
             'action' => $request->action,
         ]);
+        $this->calculateEvenly();
         return redirect(route('my-coins'))->with('success', 'Coin Updated Successfully');
     }
 
