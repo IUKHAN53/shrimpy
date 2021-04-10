@@ -129,7 +129,7 @@ return [
     'shrimpy_secret' => env('SHRIMPY_SECRET'),
     'shrimpy_default_account' => env('SHRIMPY_DEFAULT_ACCOUNT'),
     'shrimpy_default_portfolio' => env('SHRIMPY_DEFAULT_PORTFOLIO'),
-    'shrimpy_default_exchange' => env('shrimpy_default_exchange'),
+    'shrimpy_default_exchange' => env('SHRIMPY_DEFAULT_EXCHANGE'),
 
     'cipher' => 'AES-256-CBC',
 
