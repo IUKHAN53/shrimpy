@@ -214,7 +214,7 @@ class HomeController extends Controller
             $client = new API_Connection();
             $client->updatePortfolio($json_body);
         }
-        return true;
+        return back()->with('info', 'Portfolio updated successfully');
 
     }
 
