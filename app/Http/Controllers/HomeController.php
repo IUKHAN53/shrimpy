@@ -94,12 +94,12 @@ class HomeController extends Controller
     {
         $bnb = SplitShrimpy::where('symbol', 'BNB')->first();
         $percentage = 100;
-        if($bnb){
+        if ($bnb) {
             $bnb->percent = 1;
             $bnb->save();
             $percentage = 99;
         }
-        $coins = SplitShrimpy::where('symbol','!=', 'BNB')->WhereIn('action',['send','convert'])->get();
+        $coins = SplitShrimpy::where('symbol', '!=', 'BNB')->WhereIn('action', ['send', 'convert'])->get();
         $total = ($coins) ? $coins->count() : 1;
         $percent = floor($percentage / $total);
         $total_percent = 0;
@@ -186,7 +186,106 @@ class HomeController extends Controller
         ]);
     }
 
+    public function updatePortfolios()
+    {
+        $sum = DB::table('split_shrimpies')->where('action', '!=', 'remove')->sum('percent');
+        if ($sum != 100) {
+            Log::debug('Cannot Update Portfolio When sum of percents does not equals 100');
+            return back()->with('error', 'Cannot Update Portfolio When sum of percents for does not equals 100');
+        } else {
+            $coins = SplitShrimpy::whereIn('action', ['send', 'convert'])->get();
+            foreach ($coins as $coin) {
+                $symbol = ($coin->action == 'convert') ? $coin->conversion_coin : $coin->symbol;
+                $coins_data[] = '{"symbol":"' . $symbol . '","percent":"' . $coin->percent . '"}';
+            }
+            $json_body = '
+            {
+                "name":"Binance",
+                "rebalancePeriod":0,
+                "strategy":{
+                    "isDynamic":false,
+                    "allocations":[' . implode(', ', $coins_data) . ']
+                },
+                "strategyTrigger":"Threshold",
+                "rebalanceThreshold":"1",
+                "maxSpread":"10",
+                "maxSlippage":"10"
+            }';
+            $client = new API_Connection();
+            $client->updatePortfolio($json_body);
+        }
+        return true;
+
+    }
+
+
+    function getPercentage($percentage, $total)
+    {
+        return (($percentage / 100) * $total);
+    }
+
+    public function scheduledTasks()
+    {
+        file_put_contents(storage_path('logs/laravel.log'), '');
+        Log::debug('Started Syncing Coins');
+        $this->syncBinanceCoins();
+        Log::debug('Completed Syncing Coins');
+        Log::debug('----------------------------------------------');
+        Log::debug('Started Updating Portfolio');
+        $this->updatePortfolios();
+        Log::debug('Completed Updating Portfolio');
+        Log::debug('----------------------------------------------');
+        Log::debug('Started Auto Trades');
+        $this->autoTrades();
+        Log::debug('Completed Auto Trades');
+        Log::debug('----------------------------------------------');
+    }
+
     public function autoTrades()
+    {
+        $coins = SplitShrimpy::with('binance_coin')->get();
+        foreach ($coins as $coin) {
+            Log::debug('Coin: ' . $coin->symbol);
+            $high_99 = $this->getPercentage(99, $coin->binance_coin->high);
+            $high_96 = $this->getPercentage(96, $coin->binance_coin->high);
+            if ($coin->percent != 1 && $coin->binance_coin->price_usd < $high_99) {
+                if ($coin->conversion_coin == null) {
+                    $coin->action = 'remove';
+                    Log::debug('Applied Process: Set Action REMOVE for ' . $coin->symbol);
+                } else {
+                    $coin->action = 'send';
+                    Log::debug('Applied Process: Set Action SEND for ' . $coin->symbol);
+                }
+
+            } else if ($coin->percent == 1 && $coin->binance_coin->price_usd > $high_99) {
+                if ($coin->conversion_coin == null) {
+                    $coin->action = 'send';
+                    Log::debug('Applied Process: Set Action SEND for ' . $coin->symbol);
+                } else {
+                    $coin->action = 'convert';
+                    Log::debug('Applied Process: Set Action CONVERT for ' . $coin->symbol);
+                }
+            } else if ($coin->percent == 1 && $coin->binance_coin->price_usd < $high_96) {
+                if ($coin->conversion_coin == null) {
+                    $coin->action = 'send';
+                    Log::debug('Applied Process: Set Action SEND for ' . $coin->symbol);
+                } else {
+                    $coin->action = 'convert';
+                    Log::debug('Applied Process: Set Action CONVERT for ' . $coin->symbol);
+                }
+                $coin->binance_coin->high = $coin->binance_coin->price_usd;
+                $coin->binance_coin->save();
+            } else {
+                Log::debug('No Process Applied');
+                Log::debug('----------------------------------------------');
+            }
+            $coin->save();
+        }
+        return back()->with('info', 'Auto trades Applied');
+    }
+
+
+    public function old_autoTrades()
     {
         $coins = SplitShrimpy::with('binance_coin', 'usdt')->get();
         $usdt = $coins->where('symbol', 'USDT')->first();
@@ -234,58 +333,5 @@ class HomeController extends Controller
         }
         return back()->with('info', 'Auto trades Applied');
     }
-
-    public function updatePortfolios()
-    {
-        $sum = DB::table('my_coins')->sum('percent');
-        if ($sum != 100) {
-            Log::debug('Cannot Update Portfolio When sum of percents does not equals 100');
-            return back()->with('error', 'Cannot Update Portfolio When sum of percents does not equals 100');
-        } else {
-            $coins = SplitShrimpy::whereIn('action',['send','convert'])->get();
-            foreach ($coins as $coin) {
-                $coins_data[] = '{"symbol":"' . $coin['symbol'] . '","percent":"' . $coin['percent'] . '"}';
-            }
-            $json_body = '
-            {
-                "name":"Binance",
-                "rebalancePeriod":0,
-                "strategy":{
-                    "isDynamic":false,
-                    "allocations":[' . implode(', ', $coins_data) . ']
-                },
-                "strategyTrigger":"Threshold",
-                "rebalanceThreshold":"1",
-                "maxSpread":"10",
-                "maxSlippage":"10"
-            }';
-            $client = new API_Connection();
-            $client->updatePortfolio($json_body);
-        }
-        return true;
-
-    }
-
-
-    function getPercentage($percentage, $total)
-    {
-        return (($percentage / 100) * $total);
-    }
-
-    public function scheduledTasks()
-    {
-        file_put_contents(storage_path('logs/laravel.log'), '');
-        Log::debug('Started Syncing Coins');
-        $this->syncBinanceCoins();
-        Log::debug('Completed Syncing Coins');
-        Log::debug('----------------------------------------------');
-        Log::debug('Started Updating Portfolio');
-        $this->updatePortfolios();
-        Log::debug('Completed Updating Portfolio');
-        Log::debug('----------------------------------------------');
-        Log::debug('Started Auto Trades');
-        $this->autoTrades();
-        Log::debug('Completed Auto Trades');
-        Log::debug('----------------------------------------------');
-    }
 }
+
