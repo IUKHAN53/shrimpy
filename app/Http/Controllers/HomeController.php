@@ -103,17 +103,19 @@ class HomeController extends Controller
             $percentage = 99;
         }
         $coins = SplitShrimpy::where('symbol', '!=', 'BNB')->WhereIn('action', ['send', 'convert'])->get();
-        $total = ($coins) ? $coins->count() : 1;
-        $percent = floor($percentage / $total);
-        $total_percent = 0;
-        foreach ($coins as $coin) {
-            $coin->percent = $percent;
-            $coin->save();
-            $total_percent += $percent;
+        $total = $coins->count();
+        if ($total > 0){
+            $percent = floor($percentage / $total);
+            $total_percent = 0;
+            foreach ($coins as $coin) {
+                $coin->percent = $percent;
+                $coin->save();
+                $total_percent += $percent;
+            }
+            $otherCoin = SplitShrimpy::firstOrFail();
+            $otherCoin->percent += $percentage - $total_percent;
+            $otherCoin->save();
         }
-        $otherCoin = SplitShrimpy::firstOrFail();
-        $otherCoin->percent += $percentage - $total_percent;
-        $otherCoin->save();
     }
 
     public function updateAction(Request $request)
