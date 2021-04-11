@@ -26,6 +26,17 @@
                             <p style="color: red">{{ $message }}</p>@enderror
                         </div>
                         <div class="form-group">
+                            <label for="conversion_coin">Conversion Coin (Optional)</label>
+                            <select class="form-control" name="conversion_coin" id="conversion_coin">
+                                <option value="">Select Conversion Coin</option>
+                                @foreach($b_coins as $coin)
+                                    <option value="{{$coin->symbol}}" {{(old('conversion_coin') == $coin->symbol)?'selected':''}}>{{$coin->symbol}} - <span class="small">({{$coin->name}})</span></option>
+                                @endforeach
+                            </select>
+                            @error('conversion_coin')
+                            <p style="color: red">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="form-group">
                             <label for="action">Action</label>
                             <select type="number" class="form-control" name="action" id="action">
                                 <option value="" {{($my_coin->action == null)?'selected':''}}>Select Action</option>

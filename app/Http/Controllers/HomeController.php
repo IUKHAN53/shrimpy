@@ -34,6 +34,7 @@ class HomeController extends Controller
         if ($request->isMethod('post')) {
             $request->validate([
                 'binance_coin_id' => 'required', 'unique:my_coins,binance_coin_id' . $request->coin_id,
+                'conversion_coin' => '',
                 'action' => 'required'
             ], [
                 'binance_coin_id.required' => 'Coin Field is required',
@@ -42,9 +43,9 @@ class HomeController extends Controller
             SplitShrimpy::findOrFail($request->coin_id)->update([
                 'symbol' => $binance_coin->symbol,
                 'binance_coin_id' => $binance_coin->id,
+                'conversion_coin' => $request->conversion_coin ?? null,
             ]);
             return redirect(route('my-coins'))->with('success', 'Coin Updated Successfully');
-
         } else {
             return view('edit-coin')->with([
                 'my_coin' => SplitShrimpy::findOrFail($request->coin_id),
@@ -66,6 +67,7 @@ class HomeController extends Controller
         if ($request->isMethod('post')) {
             $request->validate([
                 'binance_coin_id' => 'required|unique:split_shrimpies,binance_coin_id',
+                'conversion_coin' => '',
                 'action' => 'required'
             ], [
                 'binance_coin_id.required' => 'Coin Field is required',
@@ -75,6 +77,7 @@ class HomeController extends Controller
                 'symbol' => $binance_coin->symbol,
                 'percent' => 0,
                 'action' => $request->action,
+                'conversion_coin' => $request->conversion_coin ?? null,
                 'binance_coin_id' => $binance_coin->id,
             ]);
             $this->calculateEvenly();
